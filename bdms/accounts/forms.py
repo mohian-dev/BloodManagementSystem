@@ -4,7 +4,7 @@ from django.contrib.auth.forms import UserCreationForm
 
 from django.contrib.auth import get_user_model
 
-from accounts.models import DonorProfile, BLOOD_GROUPS
+from accounts.models import DonorProfile, bloodGroup_choices
 
 
 
@@ -22,7 +22,7 @@ class DonorRegistrationForm(UserCreationForm):
 
     phone = forms.CharField(max_length=15, required=True)
 
-    blood_group = forms.ChoiceField(choices=BLOOD_GROUPS, required=True)
+    blood_group = forms.ChoiceField(choices=bloodGroup_choices, required=True)
 
     location = forms.CharField(max_length=200, required=True)
 

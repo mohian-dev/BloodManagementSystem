@@ -20,6 +20,6 @@ class DonationRequestAdmin(admin.ModelAdmin):
 
 class BloodInventoryAdmin(admin.ModelAdmin):
 
-    list_display = ['blood_group', 'units_available', 'last_updated']
+    list_display = ['blood_group', 'quantity_ml', 'last_updated']
 
     list_filter = ['blood_group']

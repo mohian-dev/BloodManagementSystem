@@ -1,0 +1,141 @@
+{% extends "base.html" %}
+{% block title %}Admin Dashboard{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h1 class="mb-4">Admin Dashboard Overview 🛠️</h1>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="card text-white bg-primary mb-3">
+            <div class="card-body">
+                <h5 class="card-title">Total Donors</h5>
+                <p class="card-text fs-2">{{ total_donors }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-white bg-warning mb-3">
+            <div class="card-body">
+                <h5 class="card-title">Pending Requests</h5>
+                <p class="card-text fs-2">{{ pending_requests }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <a href="{% url 'donor_list' %}" class="text-decoration-none">
+            <div class="card text-white bg-info mb-3">
+                <div class="card-body">
+                    <h5 class="card-title">View All Donors</h5>
+                    <p class="card-text fs-2">GO</p>
+                </div>
+            </div>
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <h2 class="mt-4">Blood Inventory Status</h2>
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover">
+                <thead class="table-danger">
+                    <tr>
+                        <th>Blood Group</th>
+                        <th>Units Available</th>
+                        <th>Last Updated</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in inventory %}
+                    <tr>
+                        <td><strong>{{ item.blood_group }}</strong></td>
+                        <td>{{ item.units_available }}</td>
+                        <td>{{ item.last_updated|date:"Y-m-d H:i" }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="3">Inventory is empty.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <h2 class="mt-4">Recent Donation Requests</h2>
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Donor</th>
+                        <th>Group</th>
+                        <th>Units</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for req in recent_requests %}
+                    <tr>
+                        <td>{{ req.donor.full_name }}</td>
+                        <td>{{ req.donor.blood_group }}</td>
+                        <td>{{ req.units }}</td>
+                        <td><span class="badge bg-{% if req.status == 'approved' %}success{% elif req.status == 'rejected' %}danger{% elif req.status == 'pending' %}warning{% else %}secondary{% endif %}">{{ req.get_status_display }}</span></td>
+                        <td>
+                            {% if req.status == 'pending' %}
+                            <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#actionModal-{{ req.pk }}">
+                                Review
+                            </button>
+                            {% elif req.status == 'approved' %}
+                            <button type="button" class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#actionModal-{{ req.pk }}">
+                                Complete
+                            </button>
+                            {% else %}
+                            -
+                            {% endif %}
+                        </td>
+                    </tr>
+                    <div class="modal fade" id="actionModal-{{ req.pk }}" tabindex="-1" aria-labelledby="actionModalLabel-{{ req.pk }}" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <form method="post" action="{% url 'approve_request' pk=req.pk %}">
+                                    {% csrf_token %}
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="actionModalLabel-{{ req.pk }}">Review Request from {{ req.donor.full_name }}</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <p><strong>Group:</strong> {{ req.donor.blood_group }} | <strong>Units:</strong> {{ req.units }} | <strong>Preferred Date:</strong> {{ req.preferred_date }}</p>
+                                        <div class="mb-3">
+                                            <label for="admin_notes_{{ req.pk }}" class="form-label">Admin Notes</label>
+                                            <textarea class="form-control" name="admin_notes" id="admin_notes_{{ req.pk }}">{{ req.admin_notes|default:"" }}</textarea>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        {% if req.status == 'pending' %}
+                                            <button type="submit" name="action" value="reject" class="btn btn-danger">Reject</button>
+                                            <button type="submit" name="action" value="approve" class="btn btn-success">Approve</button>
+                                        {% elif req.status == 'approved' %}
+                                            <button type="submit" name="action" value="complete" class="btn btn-primary">Mark as Completed</button>
+                                        {% endif %}
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5">No recent requests.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

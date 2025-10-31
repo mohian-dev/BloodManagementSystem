@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% block title %}Donor Dashboard{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h1 class="mb-4">Welcome, {{ request.user.username }}! 👋</h1>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="card text-white bg-primary mb-3">
+            <div class="card-body">
+                <h5 class="card-title">My Blood Group</h5>
+                <p class="card-text fs-2">{{ profile.blood_group }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-white bg-warning mb-3">
+            <div class="card-body">
+                <h5 class="card-title">Pending Requests</h5>
+                <p class="card-text fs-2">{{ pending_count }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-white bg-success mb-3">
+            <div class="card-body">
+                <h5 class="card-title">Availability Status</h5>
+                <p class="card-text fs-2">
+                    {% if profile.is_available %}Available{% else %}Not Available{% endif %}
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-12">
+        <a href="{% url 'request_donation' %}" class="btn btn-lg btn-danger">Request a Donation Slot</a>
+        <a href="{% url 'profile' %}" class="btn btn-lg btn-secondary">Update My Profile</a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <h2 class="mt-4">My Donation History</h2>
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Request Date</th>
+                        <th>Preferred Date</th>
+                        <th>Units</th>
+                        <th>Status</th>
+                        <th>Admin Notes</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for req in donation_history %}
+                    <tr class="{% if req.status == 'approved' %}table-success{% elif req.status == 'rejected' %}table-danger{% elif req.status == 'pending' %}table-warning{% endif %}">
+                        <td>{{ req.request_date|date:"Y-m-d" }}</td>
+                        <td>{{ req.preferred_date }}</td>
+                        <td>{{ req.units }}</td>
+                        <td>{{ req.get_status_display }}</td>
+                        <td>{{ req.admin_notes|default:"N/A" }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5">No donation requests found.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

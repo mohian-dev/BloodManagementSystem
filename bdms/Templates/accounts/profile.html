@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}My Profile{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow-sm">
+            <div class="card-header bg-danger text-white">
+                <h3 class="mb-0">Donor Profile</h3>
+            </div>
+            <div class="card-body">
+                <p><strong>Username:</strong> {{ request.user.username }}</p>
+                <p><strong>Email:</strong> {{ request.user.email }}</p>
+
+                <h4 class="mt-4">Update Donor Details</h4>
+                <form method="post">
+                    {% csrf_token %}
+                    {% for field in form %}
+                        <div class="mb-3">
+                            <label for="{{ field.id_for_label }}" class="form-label">
+                                {{ field.label }}
+                                {% if field.field.widget.input_type == 'checkbox' %}: {{ field }}{% endif %}
+                            </label>
+                            {% if field.field.widget.input_type != 'checkbox' %}
+                                {{ field|attr:"class:form-control" }}
+                            {% endif %}
+                            {% for error in field.errors %}
+                                <div class="text-danger small">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    {% endfor %}
+                    <button type="submit" class="btn btn-danger">Update Profile</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

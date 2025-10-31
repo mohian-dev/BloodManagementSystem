@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% block title %}Donor List{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h1 class="mb-4">Registered Donors</h1>
+    </div>
+</div>
+
+<div class="card mb-4">
+    <div class="card-body">
+        <h5 class="card-title">Filter Donors</h5>
+        <form method="get" class="row g-3">
+            <div class="col-md-4">
+                <label for="id_blood_group" class="form-label">Blood Group</label>
+                <select name="blood_group" id="id_blood_group" class="form-select">
+                    <option value="">All Groups</option>
+                    {% for group_value, group_label in blood_groups %}
+                    <option value="{{ group_value }}" {% if selected_blood_group == group_value %}selected{% endif %}>{{ group_label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label for="id_is_available" class="form-label">Availability</label>
+                <select name="is_available" id="id_is_available" class="form-select">
+                    <option value="">All Statuses</option>
+                    <option value="true" {% if selected_availability == 'true' %}selected{% endif %}>Available</option>
+                    <option value="false" {% if selected_availability == 'false' %}selected{% endif %}>Not Available</option>
+                </select>
+            </div>
+            <div class="col-md-4 align-self-end">
+                <button type="submit" class="btn btn-primary w-100">Apply Filter</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="table-responsive">
+    <table class="table table-striped table-hover">
+        <thead>
+            <tr>
+                <th>Full Name</th>
+                <th>Blood Group</th>
+                <th>Location</th>
+                <th>Phone</th>
+                <th>Available</th>
+                <th>Registered On</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for donor in donors %}
+            <tr>
+                <td>{{ donor.full_name }}</td>
+                <td><span class="badge bg-danger">{{ donor.blood_group }}</span></td>
+                <td>{{ donor.location }}</td>
+                <td>{{ donor.phone }}</td>
+                <td>
+                    {% if donor.is_available %}
+                        <span class="badge bg-success">Yes</span>
+                    {% else %}
+                        <span class="badge bg-secondary">No</span>
+                    {% endif %}
+                </td>
+                <td>{{ donor.created_at|date:"Y-m-d" }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="6" class="text-center">No donors match your criteria.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
