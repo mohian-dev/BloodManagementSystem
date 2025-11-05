@@ -292,7 +292,7 @@ def donor_list_view(request):
 
         'donors': donors,
 
-        'blood_groups': BLOOD_GROUPS,
+        'blood_groups': blood_group,
 
         'selected_blood_group': blood_group,
 

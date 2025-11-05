@@ -16,7 +16,7 @@ from django.contrib import messages
 
 from accounts.serializers import RegisterSerializer, DonorProfileSerializer, UserSerializer
 
-from accounts.models import DonorProfile
+from accounts.models import *
 
 from accounts.forms import DonorRegistrationForm, DonorProfileForm
 
@@ -166,7 +166,7 @@ def register_view(request):
 
     
 
-    return render(request, './register.html', {'form': form})
+    return render(request, 'accounts/register.html', {'form': form})
 
 
 
