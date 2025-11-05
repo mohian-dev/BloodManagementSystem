@@ -166,7 +166,7 @@ def register_view(request):
 
     
 
-    return render(request, 'accounts/register.html', {'form': form})
+    return render(request, './register.html', {'form': form})
 
 
 
